@@ -1,45 +1,63 @@
-let turno;
+let intervalo;
+let matrix = [];
+
+function crearMatriz(filas, columnas) {
+    matrix = [];
+    const tabla = document.getElementById('matriz');
+    tabla.innerHTML = '';
+
+    for (let i = 0; i < filas; i++) {
+        const fila = [];
+        const tr = document.createElement('tr');
+        
+        for (let j = 0; j < columnas; j++) {
+            const td = document.createElement('td');
+            fila.push(false);
+            tr.appendChild(td);
+        }
+        matrix.push(fila);
+        tabla.appendChild(tr);
+    }
+}
 
 function iniciar() {
-    detener();
+    const filas = parseInt(document.getElementById('filas').value);
+    const columnas = parseInt(document.getElementById('columnas').value);
+    const tiempo = parseInt(document.getElementById('tiempo').value * 1000);
+    const cantidad = parseInt(document.getElementById('cantidad').value);
 
-    const filas = parseInt(document.getElementById("filas").value);
-    const columnas = parseInt(document.getElementById("columnas").value);
-    const tiempo = parseInt(document.getElementById("tiempo").value);
-    const cuadros = parseInt(document.getElementById("cantidad").value);
-    const tabla = document.getElementById("matriz");
+    if (isNaN(filas) || isNaN(columnas) || isNaN(tiempo) || isNaN(cantidad) || filas < 1 || columnas < 1 || tiempo < 1 || cantidad < 1) {
+        alert('Por favor, complete todos los campos correctamente.');
+        return;
+    }
 
-    tabla.innerHTML = "";
-    const matriz = Array.from({ length: filas }, () => Array(columnas).fill(0));
+    crearMatriz(filas, columnas);
+    intervalo = setInterval(() => {
+        pintarCuadros(cantidad);
+    }, tiempo);
+}
 
-    turno = setInterval(() => {
-        const llenar = [];
-        for (let i = 0; i < cuadros; i++) {
-            let corX, corY;
-            do {
-                corX = Math.floor(Math.random() * filas);
-                corY = Math.floor(Math.random() * columnas);
-            } while (matriz[corX][corY] === 1);
-            matriz[corX][corY];
-            llenar.push([corX, corY]);
+function pintarCuadros(cantidad) {
+    for (let i = 0; i < cantidad; i++) {
+        const fil = Math.floor(Math.random() * matrix.length);
+        const col = Math.floor(Math.random() * matrix[0].length);
+
+        if (matrix[fil][col]) {
+            detener();
+            alert('El programa se ha detenido, alguno de los cuadros esta ocupado.');
+            return;            
         }
 
-        for (let i = 0; i < filas; i++) {
-            const fila = document.createElement("tr");
-            for (let j = 0; j < columnas; j++) {
-                const celda = document.createElement("td");
-                if (matriz[i][j] === 1) {
-                    celda.textContent = 'X';
-                }
-                fila.appendChild(celda);
-            }
-            tabla.appendChild(fila);
-        }
-
-        console.log("Cuadros llenados:", llenar);
-    }, tiempo * 1000);
+        matrix[fil][col] = true;
+        document.getElementsByTagName('td')[row * matrix[0].length + col].style.backgroundColor = 'blue';
+    }
 }
 
 function detener() {
-    clearInterval(turno);
+    clearInterval(intervalo);
+    limpiar();
+}
+
+function limpiar() {
+    location.reload();
 }
